@@ -1,0 +1,70 @@
+#include <msp430g2553.h>
+
+#define BUTTON BIT3
+
+unsigned int press = 0;
+unsigned int timerCount = 0;
+
+void main(void)
+{
+WDTCTL = WDTPW + WDTHOLD;  //disable watchdog timer
+P1DIR |= BIT0 ;
+
+P1OUT |=  BIT0 ; // led on
+P2DIR |= (BIT0 + BIT1 + BIT2 + BIT3)  ;
+P2OUT &=  ~(BIT0 + BIT1 + BIT2 + BIT3)  ; // 4 leds off
+P1IE |= BUTTON;  // enabling interrupt for button
+
+__enable_interrupt();
+CCTL0 = CCIE;     //enabling interrupt for timer
+ TACTL = TASSEL_2 + MC_2;    // clock chosen is SMCLk and is in continous mode
+ __bis_SR_register(LPM0 + GIE);  //low power enable
+ __enable_interrupt();
+
+
+}
+#pragma vector=PORT1_VECTOR    // button interrupt
+__interrupt void Port_1(void)
+{
+ press = press + 1; // increments the number of times the button is pressed
+
+ P1IFG &= ~BUTTON;  // interrupt flag clear
+
+
+}
+#pragma vector= TIMER0_A0_VECTOR  // timer interrupt
+__interrupt void Timer_A (void)
+{
+timerCount = (timerCount + 1) % 362;   // 20 sec timer function
+if(timerCount == 0)
+{
+ if (press > 0 ){
+       P1OUT ^= BIT0;    // button should be pressed only when this led is on
+
+   if(press == 1){ P2OUT= 0x01;}
+	 if(press == 2){ P2OUT= 0x02 ;}
+	 if(press == 3){ P2OUT= 0x03 ;}
+	 if(press == 4){ P2OUT= 0x04 ;}
+	 if(press == 5){ P2OUT= 0x05 ;}
+	 if(press == 6){ P2OUT= 0x06 ;}
+	 if(press == 7){ P2OUT= 0x07 ;}
+	 if(press == 8){ P2OUT= 0x08 ;}
+	 if(press == 9){ P2OUT= 0x09 ;}
+	 if(press == 10){ P2OUT= 0x0A ;}
+	 if(press == 11){ P2OUT= 0x0B ;}
+	 if(press == 12){ P2OUT= 0x0C ;}
+	 if(press == 13){ P2OUT= 0x0D ;}
+	 if(press== 14){ P2OUT= 0x0E ;}
+	 if(press== 15){ P2OUT= 0x0F ;}
+
+
+	 press = 0;
+
+ }
+ else {
+	 P2OUT = 0x00 ; press = 0;
+	 P1OUT |=  BIT0 ;                     // led on
+ }
+}
+}
+
