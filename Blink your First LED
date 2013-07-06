@@ -39,7 +39,7 @@ void main(void)
 
 
 
-    for(i=0; i< 20000; i++);                // Delay between LED toggles. This for-loop will run until the condition is met. 
+    for(i=0; i< 20000; i++);               // Delay between LED toggles. This for-loop will run until the condition is met. 
                                             //In this case, it will loop until the variable i increments to 20000.
   }
 }
